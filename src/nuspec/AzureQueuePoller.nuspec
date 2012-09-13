@@ -1,0 +1,23 @@
+<?xml version='1.0'?>
+<package xmlns='http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd'>
+    <metadata>
+        <id>AzureQueuePoller</id>
+        <version>$version$</version>
+        <title/>
+        <authors>Prabir Shrestha</authors>
+        <owners>Prabir Shrestha</owners>
+        <description>Helper utils to poll Windows Azure queue efficiently.</description>
+        <language>en-US</language>
+        <licenseUrl>https://github.com/prabirshrestha/AzureQueuePoller/LICENSE.txt</licenseUrl>
+        <projectUrl>https://github.com/prabirshrestha/AzureQueuePoller</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <tags>Azure Queue</tags>
+    </metadata>
+    <files>
+        <file src="..\..\LICENSE.txt" target="LICENSE.txt" />
+        <file src="..\..\bin\net40\AzureQueuePoller.dll" target="lib\net40" />
+        <file src="..\..\bin\net40\AzureQueuePoller.xml" target="lib\net40" />
+        <file src="..\..\bin\net45\AzureQueuePoller.dll" target="lib\net45" />
+        <file src="..\..\bin\net45\AzureQueuePoller.xml" target="lib\net45" />
+    </files>
+</package>

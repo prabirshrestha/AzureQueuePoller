@@ -10,6 +10,9 @@ namespace AzureQueuePoller
     using System.Threading.Tasks;
     using Microsoft.WindowsAzure.StorageClient;
 
+    /// <summary>
+    /// Cloud queue poll settings
+    /// </summary>
     public class CloudQueuePollSettings
     {
         /// <summary>
@@ -42,7 +45,7 @@ namespace AzureQueuePoller
         public Func<CloudQueue, CloudQueueMessage, Task> OnMessage { get; set; }
 
         /// <summary>
-        /// Gets or sets the action when an error occurs. (CloudQueue, Exception, CloudQueueMessage/IEnumerable<CloudQueueMessage>, isMaxRetry)
+        /// Gets or sets the action when an error occurs. (CloudQueue, Exception, CloudQueueMessage/IEnumerable&lt;CloudQueueMessage&gt;, isMaxRetry)
         /// </summary>
         /// <remarks>
         /// This method should never throw exception.
@@ -88,6 +91,9 @@ namespace AzureQueuePoller
         /// </summary>
         public CancellationToken CancellationToken { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="CloudQueuePollSettings"/>
+        /// </summary>
         public CloudQueuePollSettings()
         {
             DequeueMaxDegreeOfParallelism = 1;
@@ -109,15 +115,25 @@ namespace AzureQueuePoller
                     // obj can either be of type IEnumerable<CloudQueueMessage> or CloudQueueMessage or null.
                 }
 
-                var tcs = new TaskCompletionSource<object>();
-                tcs.TrySetResult(null);
-                return tcs.Task;
+#if ASYNC_TARGETTING_PACK
+                return TaskEx.FromResult(0);
+#else
+                return Task.FromResult(0);
+#endif
             };
         }
     }
 
+    /// <summary>
+    /// The Azure Cloud Queue Poller
+    /// </summary>
     public static class CloudQueuePoller
     {
+        /// <summary>
+        /// Start polling the azure queue.
+        /// </summary>
+        /// <param name="config">Configuration callback.</param>
+        /// <returns>The task.</returns>
         public static Task Poll(Action<CloudQueuePollSettings> config)
         {
             var settings = new CloudQueuePollSettings();
@@ -126,6 +142,12 @@ namespace AzureQueuePoller
             return Poll(settings);
         }
 
+        /// <summary>
+        /// Delay task.
+        /// </summary>
+        /// <param name="delay">Timespan.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns></returns>
         public static Task Delay(TimeSpan delay, CancellationToken cancellationToken = default(CancellationToken))
         {
 #if ASYNC_TARGETTING_PACK
@@ -135,6 +157,11 @@ namespace AzureQueuePoller
 #endif
         }
 
+        /// <summary>
+        /// Start polling the azure queue.
+        /// </summary>
+        /// <param name="settings">The poll settings.</param>
+        /// <returns>The task.</returns>
         public static Task Poll(CloudQueuePollSettings settings)
         {
             if (settings == null)
