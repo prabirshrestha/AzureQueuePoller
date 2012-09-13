@@ -4,6 +4,7 @@ var
     njake   = require('./src/njake'),
     msbuild = njake.msbuild,
     nuget   = njake.nuget,
+    assemblyInfo  = njake.assemblyInfo,
     config  = {
         rootPath: __dirname,
         version: fs.readFileSync('VERSION', 'utf-8')
@@ -28,7 +29,7 @@ directory('dist/')
 directory('working/')
 
 desc('Build')
-task('build', function () {
+task('build', ['assemblyInfo'], function () {
     msbuild({
         file: 'src/AzureQueuePoller.sln',
         targets: ['Build']
@@ -48,20 +49,40 @@ task('clean', function () {
     })
 }, { async: true })
 
+ task('assemblyInfo', function () {
+    assemblyInfo({
+        file: 'src/AzureQueuePoller/Properties/AssemblyInfo.cs',
+        assembly: {
+            notice: function () {
+                return '// Do not modify this file manually, use jakefile instead.\r\n';
+            },
+            AssemblyTitle: 'AzureQueuePoller',
+            AssemblyDescription: 'Helper utils to poll Windows Azure queue efficiently.',
+            AssemblyCompany: '',
+            AssemblyProduct: 'AzureQueuePoller',
+            AssemblyCopyright: 'Copyright © Prabir Shrestha 2012',
+            ComVisible: false,
+            AssemblyVersion: config.version,
+            AssemblyFileVersion: config.version
+        }
+    })
+    }, { async: true })
+
+
 namespace('nuget', function () {
 
+    npkgDeps = []
+
+    directory('dist/symbolsource/', ['dist/'])
+
+    nugetNuspecs = fs.readdirSync('src/nuspec').filter(function (nuspec) {
+        return nuspec.indexOf('.nuspec') > -1
+    })
+
+    symbolsourceNuspecs = fs.readdirSync('src/nuspec/symbolsource')
+
     namespace('pack', function () {
-
-        directory('dist/symbolsource/', ['dist/'])
-
-        nugetNuspecs = fs.readdirSync('src/nuspec').filter(function (nuspec) {
-            return nuspec.indexOf('.nuspec') > -1
-        })
-
-        symbolsourceNuspecs = fs.readdirSync('src/nuspec/symbolsource')
-
-        npkgDeps = []
-
+    
         nugetNuspecs.forEach(function (nuspec) {
             npkgDeps.push('nuget:pack:' + nuspec)
             task(nuspec, ['dist/', 'build'], function () {
