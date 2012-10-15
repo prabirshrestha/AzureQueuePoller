@@ -22,6 +22,7 @@
         </dependencies>
     </metadata>
     <files>
+        <file src="..\readme.txt" target="readme.txt" />
         <file src="..\..\LICENSE.txt" target="LICENSE.txt" />
         <file src="..\..\bin\net40\AzureQueuePoller.dll" target="lib\net40" />
         <file src="..\..\bin\net40\AzureQueuePoller.xml" target="lib\net40" />
